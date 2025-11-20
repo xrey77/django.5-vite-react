@@ -46,7 +46,7 @@ export default function Profile() {
             if (res.data.qrcodeurl.length == 0) {
                 setQrcodeurl(res.data.qrcodeurl);
             } else {
-                setQrcodeurl('/images/qrcode.png');
+                setQrcodeurl('/static/images/qrcode.png');
             }
 
         }, (error: any) => {
@@ -182,7 +182,7 @@ export default function Profile() {
         }})
         .then((res: any) => {
             setProfileMsg(res.data.message);
-            setQrcodeurl('/images/qrcode.png');                
+            setQrcodeurl('/static/images/qrcode.png');                
             setTimeout(() => {
                 setProfileMsg('');
             },3000);

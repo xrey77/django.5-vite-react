@@ -20,7 +20,7 @@ export default function Login() {
     setMessage('please wait...');
     setIsdisabled(true);
     const jsonData =JSON.stringify({ username: username, password: password });
-    await api.post("api/signin/", jsonData)
+    await api.post("api/signin", jsonData)
     .then((res: any) => {
             setMessage(res.data.message);
             if (res.data.qrcodeurl.length > 0) {
