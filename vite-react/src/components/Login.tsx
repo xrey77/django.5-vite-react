@@ -4,7 +4,7 @@ import jQuery from "jquery";
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: "http://127.0.0.1:8000",
   headers: {'Accept': 'application/json',
             'Content-Type': 'application/json'}
 })
@@ -20,7 +20,7 @@ export default function Login() {
     setMessage('please wait...');
     setIsdisabled(true);
     const jsonData =JSON.stringify({ username: username, password: password });
-    await api.post("api/signin", jsonData)
+    await api.post("api/signin/", jsonData)
     .then((res: any) => {
             setMessage(res.data.message);
             if (res.data.qrcodeurl.length > 0) {

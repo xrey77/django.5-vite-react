@@ -43,8 +43,8 @@ export default function Profile() {
             setUserpicture(res.data.userpic);
             setQrcodeurl(res.data.qrcodeurl);     
 
-            if (res.data.qrcodeurl.length == 0) {
-                setQrcodeurl(res.data.qrcodeurl);
+            if (res.data.qrcodeurl.length > 0) {
+                setQrcodeurl(res.data.qrcodeurl.slice(2));
             } else {
                 setQrcodeurl('/static/images/qrcode.png');
             }
@@ -53,6 +53,24 @@ export default function Profile() {
             setProfileMsg(error.response.data.message);            
         });
     };    
+
+    const getQrcodeurl = (id: any, token: any) => {
+        mfaapi.get(`api/mfa/getqrcode/${id}/`,{headers: {
+            Authorization: `Bearer ${token}`
+        }})
+        .then((res: any) => {
+
+            if (res.data.qrcodeurl.length > 0) {
+                setQrcodeurl(res.data.qrcodeurl)                
+            } else {
+                setQrcodeurl('/static/images/qrcode.png')
+            }
+
+        }, (error: any) => {
+            setProfileMsg(error.response.data.messages.error);            
+        });          
+    }
+
 
     useEffect(() => {
         jQuery("#password").prop('disabled', true);
@@ -145,8 +163,8 @@ export default function Profile() {
             setShowPwd(false);
             jQuery('#checkChangePassword').prop('checked', false);
             setTimeout(() => {
-                // getQrcodeurl(userid, token);
-            }, 2000);
+                getQrcodeurl(userid, token);
+            }, 1000);
             return;
         } else {
             setShowMfa(false);

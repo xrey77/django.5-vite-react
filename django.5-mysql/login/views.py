@@ -20,53 +20,36 @@ class UserLogin(APIView):
         usrname = req['username']
         passwd  = req['password']
         try:
-          djangoUser = User.objects.get(username = usrname)           
+          djangoUser = Users.objects.get(username = usrname)           
           if djangoUser: 
-            userauth = authenticate(username=usrname, password=passwd)
-            if userauth is not None:
-            
-                xuser = Users.objects.filter(username=usrname).first()
-                if xuser:
-                    
-                    # for data in user:
-                    if check_password(passwd, xuser.password): 
+                                              
+            if check_password(passwd, djangoUser.password): 
 
-                                                                                                                                    
-                        tokens = get_tokens_for_user(userauth)
-                        
-                        return Response({
-                            'message': 'Login Successfull.',
-                            'id': xuser.id,
-                            'firstname': xuser.firstname,
-                            'lastname': xuser.lastname,
-                            'email': xuser.email,
-                            'username': xuser.username,
-                            'roles': xuser.roles,
-                            'isactivated': xuser.isactivated,
-                            'isblocked': xuser.isblocked,
-                            'userpic': str(xuser.userpic),
-                            'qrcodeurl': str(xuser.qrcodeurl),
-                            'token': tokens['access']
-                            }, status.HTTP_200_OK)
-                            
-                    else:
-                        return Response({'message': 'Invalid Password.'}, status.HTTP_404_NOT_FOUND)
-                    
-                else:
-                    return Response({'message': 'Username not found'}, status.HTTP_404_NOT_FOUND)            
+                userauth = authenticate(username=usrname, password=passwd)                                                                                                                                
+                tokens = get_tokens_for_user(userauth)
                 
+                return Response({
+                    'message': 'Login Successfull.',
+                    'id': djangoUser.id,
+                    'firstname': djangoUser.firstname,
+                    'lastname': djangoUser.lastname,
+                    'email': djangoUser.email,
+                    'username': djangoUser.username,
+                    'roles': djangoUser.roles,
+                    'isactivated': djangoUser.isactivated,
+                    'isblocked': djangoUser.isblocked,
+                    'userpic': str(djangoUser.userpic),
+                    'qrcodeurl': str(djangoUser.qrcodeurl),
+                    'token': tokens['access']
+                    }, status.HTTP_200_OK)
+                    
             else:
-                return Response({'message': 'Invalid Credentials.'}, status.HTTP_406_NOT_ACCEPTABLE) 
-                                    
+                return Response({'message': 'Invalid Password, please try again.'}, status.HTTP_404_NOT_FOUND)
             
-        except User.DoesNotExist:
-            return Response({'message': 'Username not found.'}, status.HTTP_404_NOT_FOUND)
+            
+        except Users.DoesNotExist:
+            return Response({'message': 'Username not found, please register.'}, status.HTTP_404_NOT_FOUND)
 
-                    # return Response({'message': 'Invalid Credentials.' }, status.HTTP_400_BAD_REQUEST) 
-        # except ObjectDoesNotExist:            
-        #             return Response({'message': 'Invalid Credentials.'}, status.HTTP_404_NOT_FOUND) 
-        # except FileNotFoundError:            
-        #             return Response({'message': 'Invalid Credentials.'}, status.HTTP_404_NOT_FOUND) 
             
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)

@@ -23,20 +23,9 @@ class MfaActivate(APIView):
                 totp = pyotp.TOTP(secret_key)        
                 qrcodeuri = totp.provisioning_uri(name=user.email, issuer_name='SUPERCARS INC.')
                 qrcode_base64 = generate_qr_code_base64(qrcodeuri)                
-                # print(qrcode_base64)
-                # partial = request.method == 'PATCH'
-                # jsonData = {
-                #     'secret': secret_key,
-                #     'qrcodeurl': qrcode_base64
-                # }
                 
                 Users.objects.filter(id=idno).update(secret=secret_key, qrcodeurl=qrcode_base64)                
 
-                # serializer = UserSerializer(user, data=jsonData, partial=partial)
-                # if serializer.is_valid():
-                #     qrcodeb64 = serializer.save()                    
-                #     qrcodeb64.qrcodeurl = qrcode_base64
-                #     qrcodeb64.save()
                 return Response({
                     'qrcodeurl': qrcode_base64,
                     'message': 'Multi-Factor Authenticator is enabled.'}, status=status.HTTP_201_CREATED)
@@ -50,6 +39,20 @@ class MfaActivate(APIView):
                 user.qrcodeurl  = None
                 user.save()
                 return Response({'message': 'Multi-Factor Authenticator is disabled.'}, status=status.HTTP_201_CREATED)
+        
+class MfaQrcode(APIView):
+    def get(self, request, *args, **kwargs):
+        idno = kwargs.get('id')
+        user = Users.objects.filter(id=idno).first()
+        if user:            
+            secret_key = user.secret
+            totp = pyotp.TOTP(secret_key)        
+            qrcodeuri = totp.provisioning_uri(name=user.email, issuer_name='SUPERCARS INC.')
+            qrcode_base64 = generate_qr_code_base64(qrcodeuri)                
+            
+            return Response({'qrcodeurl': qrcode_base64}, status=status.HTTP_201_CREATED)
+    
+    
         
 class MfaVerification(APIView):    
     def patch(self, request, *args, **kwargs):
